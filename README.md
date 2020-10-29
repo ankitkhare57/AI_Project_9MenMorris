@@ -70,5 +70,7 @@
 **`Description: This is the main function that uses all the above functions to implement the game. Here the probability of failing to remove an opponent's piece after forming a mill is 25% of the time. This is decided by the variable “ans” in the code.`**
 
 ***`References:`***
+
 **`The Rules of Merels or Nine Men’s Morris. (2019). Retrieved October 28, 2020, from https://www.mastersofgames.com/rules/morris-rules.htm`**
+
 **`9MensMorris. (2019). Retrieved October 28, 2020, from https://github.com/SidJain1412/9MensMorris`**
