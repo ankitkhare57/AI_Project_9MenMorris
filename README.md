@@ -1,5 +1,12 @@
 
-### Steps to run the Project:
+### Steps to run the Project (Phase II):
+1.  Download/Clone repository
+2.  cd "Phase II" 
+3.  Run main.py
+4.  Follow on screen prompts.
+
+
+### Steps to run the Project (Phase I):
 1.  Download/Clone repository
 2.  Run human_vs_human.py 
 3.  Follow on-screen prompts.
