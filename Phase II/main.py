@@ -10,9 +10,8 @@ alpha = float('-inf')
 beta = float('inf')
 depth = 3
 ai_depth = 4
-n = 6
+n = 9
 board_size = int((8*n)/3)
-# print(board_size)
 
 def boardOutput(board):
 		
@@ -39,8 +38,8 @@ def boardOutput(board):
 def AI_VS_AI(h1, h2):
 
 	board = []
-	for i in range(board_size):
-		board.append("X")
+	for i in range(24):
+		board.append('X')
 
 	# boardOutput(board)
 
@@ -50,12 +49,12 @@ def AI_VS_AI(h1, h2):
 
 	# Stage 1: AI 1 - Baseline
 	print("Stage 1")
-	for i in range(n):
+	for i in range(9):
 	
 		temp_empty_positions = []
 		temp_positions_player2 = []
 
-		for i in range(board_size):
+		for i in range(24):
 			if board[i] == 'X':
 				temp_empty_positions.append(i)
 			if board[i] == '2' and (not isMill_BaselineAI(i, board)):
@@ -74,7 +73,7 @@ def AI_VS_AI(h1, h2):
 				else: 
 					ans = 0.25
 				selected_move = random.choice(temp_positions_player2)
-				if board[selected_move] == "2" and not isCloseMill(selected_move, board) or allIsMill(board, '2'):
+				if board[selected_move] == '2' and not isCloseMill(selected_move, board) or allIsMill(board, '2'):
 					if ans == 0.75:
 						board[selected_move] = 'X'
 						itemPlaced = True
@@ -88,9 +87,12 @@ def AI_VS_AI(h1, h2):
 		
 		# AI 2
 		evalBoard = alphaBetaPruning(board, ai_depth, False, alpha, beta, True, h1)
-		states_reached = getStatesReached()
 		# boardOutput(board)
-		# print_board_six(board)
+		
+		states_reached = getStatesReached()
+		print("Number of tree nodes processed: ", states_reached)
+		nodes_accessed += states_reached
+
 		temp = evalBoard.board
 		if evalBoard.evaluator == float('-inf'):
 			print("AI Bot 2 has won!")
@@ -100,7 +102,7 @@ def AI_VS_AI(h1, h2):
 			human_pieces = numOfValue(board, '1')
 			human_pieces_ai = numOfValue(temp, '1')
 			if human_pieces_ai - human_pieces < 0:
-				for i in range(board_size):
+				for i in range(24):
 					if board[i] == 'X' and temp[i] == '2':
 						pos = i
 						break
@@ -114,6 +116,7 @@ def AI_VS_AI(h1, h2):
 					board[pos] = '2'
 			else:
 				board = temp
+
 
 
 	# Stage 2: BaseLine AI
@@ -144,10 +147,10 @@ def AI_VS_AI(h1, h2):
 		
 		board[player1_positions[idx_player_to_move]] = 'X'
 		board[new_pos] = '1'
-		print('Player AI has moved from '+str(player1_positions[idx_player_to_move])+' to '+str(new_pos))
+		print('Baseline AI has moved from '+str(player1_positions[idx_player_to_move])+' to '+str(new_pos))
 		# boardOutput(board)
 		if isCloseMill(new_pos, board):
-			print('Player AI Forms Mill at position', new_pos)
+			print('BaseLine AI Forms Mill at position', new_pos)
 			userHasRemoved = False
 			while not userHasRemoved:
 				# boardOutput(board)
@@ -159,14 +162,14 @@ def AI_VS_AI(h1, h2):
 					ans = 0.75
 
 				temp_positions_player2 = []
-				for i in range(board_size):
+				for i in range(24):
 					if board[i] == '2' and (not isMill_BaselineAI(i, board)):
 						temp_positions_player2.append(i)
 
 				selected_remove = random.choice(temp_positions_player2)
-				if board[selected_remove] == "2" and not isCloseMill(selected_remove, board) or allIsMill(board, '2'):
+				if board[selected_remove] == '2' and not isCloseMill(selected_remove, board) or allIsMill(board, '2'):
 					if ans == 0.75:
-						board[selected_remove] = "X"
+						board[selected_remove] = 'X'
 						userHasRemoved = True
 						
 						print("Probability of removing Player '2\'s' piece", ans)
@@ -189,15 +192,16 @@ def AI_VS_AI(h1, h2):
 			# sys.exit()
 
 		elif numOfValue(board, '2') < 3:
-			print("PLAYER '1'(BaselineAI) WINS")
+			print("Baseline AI WINS!")
 			return nodes_accessed, alphabeta_win
 			# sys.exit()
 
 		# AI 2
 		evaluation = alphaBetaPruning(board, ai_depth, False, alpha, beta, False, h2)
+
+		
 		states_reached = getStatesReached()
 		# boardOutput(board)
-		# print_board_six(board)
 		print("Number of tree nodes processed: ", states_reached)
 		nodes_accessed += states_reached
 
@@ -211,12 +215,12 @@ def AI_VS_AI(h1, h2):
 			human_pieces = numOfValue(board, '1')
 			human_pieces_ai = numOfValue(temp, '1')
 			if human_pieces_ai - human_pieces < 0:
-				for i in range(board_size):
+				for i in range(24):
 					if board[i] == 'X' and temp[i] == '2':
 						pos = i
 						break
 
-				for j in range(board_size):
+				for j in range(24):
 					if board[j] == '2' and temp[j] == 'X':
 						old_pos = j
 						break
@@ -233,15 +237,15 @@ def AI_VS_AI(h1, h2):
 					board[old_pos] = 'X'
 			else:
 				board = temp
-	# print(nodes_accessed)
+
 	return nodes_accessed, alphabeta_win
 
 
 def HUMAN_VS_AI(heuristic_stage1, heuristic_stage23):
 	
 	board = []
-	for i in range(board_size):
-		board.append("X")
+	for i in range(24):
+		board.append('X')
 
 	evaluation = evaluator()
 		
@@ -254,19 +258,31 @@ def HUMAN_VS_AI(heuristic_stage1, heuristic_stage23):
 
 				pos = int(input("\nPlace '1' piece: "))	
 				
-				if board[pos] == "X":
+				if board[pos] == 'X':
 					
 					board[pos] = '1'
 					if isCloseMill(pos, board):
 						itemPlaced = False
 						while not itemPlaced:
 							try:
-
+								arr = [1, 1, 1, 0]
+								ans = random.choice(arr)
+								if ans == 1:
+									ans = 0.75
+								else:
+									ans = 0.25
 								pos = int(input("\nRemove '2' piece: "))
 								
-								if board[pos] == "2" and not isCloseMill(pos, board) or allIsMill(board, '2'):
-									board[pos] = "X"
-									itemPlaced = True
+								if board[pos] == '2' and not isCloseMill(pos, board) or allIsMill(board, '2'):
+									if ans == 0.75:
+										board[pos] = 'X'
+										itemPlaced = True
+										print("Probability of removing Player '2\'s' piece", ans)
+										print("Remove Successful")
+									else:
+										print("Probability of removing Player '2\'s' piece", ans)
+										print("Cannot Remove. Player '2\'s' turn")
+										break
 								else:
 									print("Invalid position")
 									
@@ -283,9 +299,8 @@ def HUMAN_VS_AI(heuristic_stage1, heuristic_stage23):
 		
 		boardOutput(board)
 
-		# AI Turn
 		evalBoard = alphaBetaPruning(board, depth, False, alpha, beta, True, heuristic_stage1)
-
+		
 		temp = evalBoard.board
 		if evalBoard.evaluator == float('-inf'):
 			print("AI WINS!")
@@ -294,7 +309,7 @@ def HUMAN_VS_AI(heuristic_stage1, heuristic_stage23):
 			human_pieces = numOfValue(board, '1')
 			human_pieces_ai = numOfValue(temp, '1')
 			if human_pieces_ai - human_pieces < 0:
-				for i in range(board_size):
+				for i in range(24):
 					if board[i] == 'X' and temp[i] == '2':
 						pos = i
 						break
@@ -323,21 +338,21 @@ def HUMAN_VS_AI(heuristic_stage1, heuristic_stage23):
 					only3 = False
 
 				while not movable:
-					pos1 = input("\nPLAYER '1': Which '1\'s' piece will you move?: ")
+					pos1 = int(input("\nPLAYER '1': Which '1\'s' piece will you move?: "))
 
 					# Exit Program
-					if pos1 == 'exit':
-						sys.exit()
-					pos1 = int(pos1)
+					# if pos1 == 'exit':
+					# 	sys.exit()
+					# pos1 = int(pos1)
 
 					while board[pos1] != '1':
 						print("Invalid. Try again.")
-						pos1 = input("\nPLAYER '1': Which '1\'s' piece will you move?: ")
+						pos1 = int(input("\nPLAYER '1': Which '1\'s' piece will you move?: "))
 
 						# Exit Program
-						if pos1 == 'exit':
-							sys.exit()
-						pos1 = int(pos1)
+						# if pos1 == 'exit':
+						# 	sys.exit()
+						# pos1 = int(pos1)
 
 					if only3:
 						movable = True
@@ -356,12 +371,12 @@ def HUMAN_VS_AI(heuristic_stage1, heuristic_stage23):
 				userPlaced = False
 
 				while not userPlaced:
-					newpos1 = input("'1\'s' New Position is : ")
+					newpos1 = int(input("'1\'s' New Position is : "))
 
 					# Exit Program
-					if newpos1 == 'exit':
-						sys.exit()
-					newpos1 = int(newpos1)
+					# if newpos1 == 'exit':
+					# 	sys.exit()
+					# newpos1 = int(newpos1)
 
 					if newpos1 in adjacentLocations(pos1) or only3:
 						if board[newpos1] == 'X':
@@ -381,12 +396,12 @@ def HUMAN_VS_AI(heuristic_stage1, heuristic_stage23):
 										else: 
 											ans = 0.75
 
-										removepos1 = input("\nA Mill is Formed. Remove Player '2\'s' piece: ")
+										removepos1 = int(input("\nA Mill is Formed. Remove Player '2\'s' piece: "))
 
 										# Exit Program
-										if removepos1 == 'exit':
-											sys.exit()
-										removepos1 = int(removepos1)
+										# if removepos1 == 'exit':
+										# 	sys.exit()
+										# removepos1 = int(removepos1)
 
 										if board[removepos1] == '2' and not isCloseMill(removepos1, board) or allIsMill(board, '2'):
 											if ans == 0.75:
@@ -434,7 +449,7 @@ def HUMAN_VS_AI(heuristic_stage1, heuristic_stage23):
 
 		# Stage 2: Player 2
 		evaluation = alphaBetaPruning(board, depth, False, alpha, beta, False, heuristic_stage23)
-
+		
 		temp = evaluation.board
 		if evaluation.evaluator == float('-inf'):
 			print("AI WINS")
@@ -443,12 +458,12 @@ def HUMAN_VS_AI(heuristic_stage1, heuristic_stage23):
 			human_pieces = numOfValue(board, '1')
 			human_pieces_ai = numOfValue(temp, '1')
 			if human_pieces_ai - human_pieces < 0:
-				for i in range(board_size):
+				for i in range(24):
 					if board[i] == 'X' and temp[i] == '2':
 						pos = i
 						break
 
-				for i in range(board_size):
+				for i in range(24):
 					if board[i] == '2' and temp[i] == 'X':
 						old_pos = i
 						break
@@ -468,28 +483,22 @@ def HUMAN_VS_AI(heuristic_stage1, heuristic_stage23):
 				board = temp
 
 
-def HUMAN_VS_AIBaseline():
+def HUMAN_VS_AIBaseline(numberPlayers):
 	board = []
-	for i in range(board_size):
-		board.append("X")
+	for i in range(24):
+		board.append('X')
 
 	boardOutput(board)
-	for i in range(9):
+	for i in range(numberPlayers):
 
 		# Stage 1: Player 1
 		finished = False
 		while not finished:
 			try:
-				pos = input("\nPlace '1' piece: ")
+				pos = int(input("\nPlace '1' piece: "))
 				print()
 
-				# Exit the program
-				if pos == 'exit':
-					sys.exit()
-				else:
-					pos = int(pos)
-
-				if board[pos] == "X":
+				if board[pos] == 'X':
 					board[pos] = '1'
 
 					if isCloseMill(pos, board):
@@ -504,14 +513,9 @@ def HUMAN_VS_AIBaseline():
 									ans = 0.25
 									
 								boardOutput(board)
-								pos = input("\nA Mill is Formed.\nRemove Player 2's piece: ")
+								pos = int(input("\nA Mill is Formed.\nRemove Player 2's piece: "))
 
-								# Exit Program
-								if pos == 'exit':
-									sys.exit()
-								pos = int(pos)
-
-								if board[pos] == "2" and not isCloseMill(pos, board) or allIsMill(board, '2'):
+								if board[pos] == '2' and not isCloseMill(pos, board) or allIsMill(board, '2'):
 									if ans == 0.75:
 										board[pos] = 'X'
 										itemPlaced = True
@@ -546,11 +550,18 @@ def HUMAN_VS_AIBaseline():
 		temp_empty_positions = []
 		temp_positions_player1 = []
 
-		for i in range(board_size):
+
+		allMill = allIsMill(board, '1')
+		for i in range(24):
 			if board[i] == 'X':
 				temp_empty_positions.append(i)
-			if board[i] == '1' and (not isMill_BaselineAI(i, board)):
+			if allMill and board[i] == '1':
 				temp_positions_player1.append(i)
+			if not allMill and board[i] == '1' and not isMill_BaselineAI(i, board):
+				temp_positions_player1.append(i)
+
+			# if (board[i] == '1' and (not allIsMill(board, '1'))) or (board[i] == '1' and allIsMill(board, '1')):
+				
 
 		selected_move = random.choice(temp_empty_positions)
 		print('Player AI plays at', selected_move)
@@ -565,7 +576,9 @@ def HUMAN_VS_AIBaseline():
 				else: 
 					ans = 0.25
 				selected_move = random.choice(temp_positions_player1)
-				if board[selected_move] == "1" and not isCloseMill(selected_move, board) or allIsMill(board, '1'):
+				print(selected_move)
+				# if board[selected_move] == '1' and not isCloseMill(selected_move, board) or allIsMill(board, '1'):
+				if board[selected_move] == '1':
 					if ans == 0.75:
 						board[selected_move] = 'X'
 						itemPlaced = True
@@ -576,7 +589,7 @@ def HUMAN_VS_AIBaseline():
 						print("Cannot Remove. Player '1\'s' turn")
 						break
 
-		# boardOutput(board)
+		boardOutput(board)
 
 	# Stage 2: Player 1---------------------------------------------------------------------
 	print('STAGE 2:-')
@@ -593,21 +606,21 @@ def HUMAN_VS_AIBaseline():
 					only3 = False
 
 				while not movable:
-					pos1 = input("\nPLAYER '1': Which '1\'s' piece will you move?: ")
+					pos1 = int(input("\nPLAYER '1': Which '1\'s' piece will you move?: "))
 
 					# Exit Program
-					if pos1 == 'exit':
-						sys.exit()
-					pos1 = int(pos1)
+					# if pos1 == 'exit':
+					# 	sys.exit()
+					# pos1 = int(pos1)
 
 					while board[pos1] != '1':
 						print("Invalid. Try again.")
-						pos1 = input("\nPLAYER '1': Which '1\'s' piece will you move?: ")
+						pos1 = int(input("\nPLAYER '1': Which '1\'s' piece will you move?: "))
 
 						# Exit Program
-						if pos1 == 'exit':
-							sys.exit()
-						pos1 = int(pos1)
+						# if pos1 == 'exit':
+						# 	sys.exit()
+						# pos1 = int(pos1)
 
 					if only3:
 						movable = True
@@ -626,12 +639,12 @@ def HUMAN_VS_AIBaseline():
 				userPlaced = False
 
 				while not userPlaced:
-					newpos1 = input("'1\'s' New Position is : ")
+					newpos1 = int(input("'1\'s' New Position is : "))
 
 					# Exit Program
-					if newpos1 == 'exit':
-						sys.exit()
-					newpos1 = int(newpos1)
+					# if newpos1 == 'exit':
+					# 	sys.exit()
+					# newpos1 = int(newpos1)
 
 					if newpos1 in adjacentLocations(pos1) or only3:
 						if board[newpos1] == 'X':
@@ -651,12 +664,12 @@ def HUMAN_VS_AIBaseline():
 										else: 
 											ans = 0.75
 
-										removepos1 = input("\nA Mill is Formed. Remove Player '2\'s' piece: ")
+										removepos1 = int(input("\nA Mill is Formed. Remove Player '2\'s' piece: "))
 
 										# Exit Program
-										if removepos1 == 'exit':
-											sys.exit()
-										removepos1 = int(removepos1)
+										# if removepos1 == 'exit':
+										# 	sys.exit()
+										# removepos1 = int(removepos1)
 
 										if board[removepos1] == '2' and not isCloseMill(removepos1, board) or allIsMill(board, '2'):
 											if ans == 0.75:
@@ -726,12 +739,14 @@ def HUMAN_VS_AIBaseline():
 
 			selected = False
 
+			new_pos = idx_player_to_move = 0
 			while not selected:
 				idx_player_to_move = random.choice(range(len(player2_positions)))
 				possible_loc = player2_poss[idx_player_to_move]
 				if len(possible_loc) > 0:
 					new_pos = random.choice(possible_loc)
-					selected = True
+					if board[new_pos] == 'X':
+						selected = True
 
 			
 			board[player2_positions[idx_player_to_move]] = 'X'
@@ -750,22 +765,33 @@ def HUMAN_VS_AIBaseline():
 					else: 
 						ans = 0.75
 					temp_positions_player1 = []
-					for i in range(board_size):
-						if board[i] == '1' and (not isMill_BaselineAI(i, board)):
+
+					for i in range(24):
+						# if board[i] == 'X':
+						# 	temp_empty_positions.append(i)
+						if allMill and board[i] == '1':
+							temp_positions_player1.append(i)
+						if not allMill and board[i] == '1' and not isMill_BaselineAI(i, board):
 							temp_positions_player1.append(i)
 
-					selected_remove = random.choice(temp_positions_player1)
-					if board[selected_remove] == "1" and not isCloseMill(selected_remove, board) or allIsMill(board, '1'):
-						if ans == 0.75:
-							board[selected_remove] = "X"
-							userHasRemoved = True
-							
-							print("Probability of removing Player '1\'s' piece", ans)
-							print("Remove Successful at position", selected_move)
-						else:
-							print("Probability of removing Player '1\'s' piece", ans)
-							print("Cannot Remove. Player '1\'s' turn")
-							break
+					# for i in range(24):
+					# 	if board[i] == '1' and (not isMill_BaselineAI(i, board)):
+					# 		temp_positions_player1.append(i)
+
+					# selected_remove = random.choice(temp_positions_player1)
+					selected_move = random.choice(temp_positions_player1)
+					print(selected_move)
+					# if board[selected_remove] == '1' and not isCloseMill(selected_remove, board) or allIsMill(board, '1'):
+					# if board[selected_remove] == '1' and not isCloseMill(selected_remove, board) or allIsMill(board, '1'):
+					if ans == 0.75:
+						board[selected_remove] = 'X'
+						userHasRemoved = True
+						print("Probability of removing Player '1\'s' piece", ans)
+						print("Remove Successful at position", selected_move)
+					else:
+						print("Probability of removing Player '1\'s' piece", ans)
+						print("Cannot Remove. Player '1\'s' turn")
+						break
 
 				# print('Player AI removed 1\'s at', selected_remove)
 
@@ -796,29 +822,30 @@ if __name__ == "__main__":
 	print("3. Baseline AI vs Tree-based AI")
 	print("4. Simulate Baseline AI vs Tree-based AI x 100 & plot")
 
-	gametype = input("Please enter 1, 2, 3 or 4: ")
+	gametype = int(input("Please enter 1 or 2 or 3 or 4: "))
 
-	while gametype != "1" and gametype != "2" and gametype != "3" and gametype != "4":
-		gametype = input("Please enter 1 or 2 or 3")
+	while gametype != 1 and gametype != 2 and gametype != 3 and gametype != 4:
+		gametype = int(input("Please enter 1 or 2 or 3 or 4"))
 
-	if gametype == "1":
-		HUMAN_VS_AIBaseline()
-	elif gametype == "2":
+	if gametype == 1:
+		numberPlayers = int(input())
+		HUMAN_VS_AIBaseline(numberPlayers)
+	elif gametype == 2:
 		HUMAN_VS_AI(numberOfPiecesHeuristic, AdvancedHeuristic)
-	elif gametype == '3':
+	elif gametype == 3:
 		AI_VS_AI(numberOfPiecesHeuristic, AdvancedHeuristic)
-	elif gametype == "4":
+	elif gametype == 4:
 		nodes_arr = []
 		winners_arr = []
-		for i in range(0,10):
+		for i in range(5):
 			nodes, winner = AI_VS_AI(numberOfPiecesHeuristic, AdvancedHeuristic)
 			nodes_arr.append(nodes)
 			winners_arr.append(winner)
-			print("Game " + str(i) + " finished!")
-			print("nodes per game: ", nodes)
-			print("winner ", winner)
-		print("nodes_arr: ", nodes_arr)
-		print("winner_arr: ", winners_arr)
+			print("Game " + str(i+1) + " finished!")
+			print("Nodes Per Game: ", nodes)
+			print("Winner ", winner)
+		print("Nodes Array: ", nodes_arr)
+		print("Winner Array: ", winners_arr)
 
 
 
