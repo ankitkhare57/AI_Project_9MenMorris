@@ -43,7 +43,7 @@ def adjacentLocations(position):
         [4, 10, 15], [11, 14],
         [6, 13, 15], [12, 14]
     ]
-	return adjacent_6[position]
+	return adjacent[position]
 
 def checkMillFormation(position, board, player):
 	'''
@@ -107,7 +107,7 @@ def isMill(player, board, pos1, pos2):
 def isMill_BaselineAI(position, board):
     player = board[position]
     if player != 'x':
-        return checkNextMill_six(position, board, player)
+        return checkMillFormation(position, board, player)
     else:
         return False
 
@@ -137,7 +137,7 @@ def isCloseMill(position, board):
 
 	# if position is not empty
 	if (player != "X"):
-		return checkNextMill_six(position, board, player)
+		return checkMillFormation(position, board, player)
 	
 	return False
 
@@ -238,8 +238,8 @@ def getPossibleMillCount(board, player):
 
 	for i in range(len(board)):
 		if (board[i] == "X"):
-			# if checkMillFormation(i, board, player):
-			if checkNextMill_six(i, board, player):
+			if checkMillFormation(i, board, player):
+			# if checkNextMill_six(i, board, player):
 				count += 1
 	return count
 
@@ -270,8 +270,8 @@ def potentialMillInFormation(position, board, player):
 	adjacent_list = adjacentLocations(position)
 
 	for i in adjacent_list:
-		# if (board[i] == player) and (not checkMillFormation(position, board, player)):
-		if (board[i] == player) and (not checkNextMill_six(position, board, player)):
+		if (board[i] == player) and (not checkMillFormation(position, board, player)):
+		# if (board[i] == player) and (not checkNextMill_six(position, board, player)):
 			return True
 	return False
 
