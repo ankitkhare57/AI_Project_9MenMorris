@@ -2,6 +2,7 @@ from AlphaBeta import *
 from BoardLogic import *
 from heuristics import *
 from Utility import *
+from NeuralNet import *
 import time
 import random
 import sys
@@ -12,6 +13,7 @@ depth = 3
 ai_depth = 4
 n = 9
 board_size = int((8*n)/3)
+iterations = 5
 
 def boardOutput(board):
         
@@ -33,7 +35,157 @@ def boardOutput(board):
         print("|                           |                           |")
         print("|                           |                           |")
         print(board[5]+"(05)----------------------"+board[6]+"(06)----------------------"+board[7]+"(07)")
-    
+
+def AI_VS_AI_NN(h1, h2):
+
+    board = []
+    for i in range(24):
+        board.append('X')
+
+    evaluation = evaluator()
+    nodes_accessed = 0
+    alphabeta_win = 0
+
+    board_size = 24
+    net = BlockusNet1(board_size=board_size)
+    print(net)
+
+    # Stage 1
+    print("Stage 1")
+    for i in range(9):
+
+        # AI 1 - AI with NN
+        import pickle as pk
+        # with open("data%d.pkl" % board_size,"rb") as f: (x, y_targ) = pk.load(f)
+
+        # Optimization loop
+        x = encode(board)
+        print(x)
+        y_targ = encode(alphaBetaPruning(board, ai_depth, False, alpha, beta, True, h1).board)
+        # print("---ytarg")
+        # print(y_targ)
+
+        optimizer = tr.optim.Adam(net.parameters())
+        train_loss, test_loss = [], []
+        shuffle = np.random.permutation(range(len(x)))
+        split = 12
+        train, test = shuffle[:-split], shuffle[-split:]
+        for epoch in range(iterations):
+            y_train, e_train = optimization_step(optimizer, net, x[train], y_targ[train])
+            y_test, e_test = calculate_loss(net, x[test], y_targ[test])
+            if epoch % 10 == 0: print("%d: %f (%f)" % (epoch, e_train.item(), e_test.item()))
+            train_loss.append(e_train.item() / (len(shuffle)-split))
+            test_loss.append(e_test.item() / split)
+        
+        tr.save(net.state_dict(), "model%d.pth" % board_size)
+        
+        board = decode(x)
+
+        # AI 2
+        evalBoard = alphaBetaPruning(board, ai_depth, False, alpha, beta, True, h1)
+        boardOutput(board)
+        
+        states_reached = getStatesReached()
+        print("Number of tree nodes processed: ", states_reached)
+        nodes_accessed += states_reached
+
+        temp = evalBoard.board
+        if evalBoard.evaluator == float('-inf'):
+            print("AI Bot 2 has won!")
+            alphabeta_win = 1
+            return nodes_accessed, alphabeta_win
+        else:
+            human_pieces = numOfValue(board, '1')
+            human_pieces_ai = numOfValue(temp, '1')
+            if human_pieces_ai - human_pieces < 0:
+                for i in range(24):
+                    if board[i] == 'X' and temp[i] == '2':
+                        pos = i
+                        break
+                arr = [1, 1, 1, 0]
+                ans = random.choice(arr)
+                if ans == 1:
+                    board = evalBoard.board
+                    print("Removal Successful")
+                else:
+                    print("Removal Unsuccessful")
+                    board[pos] = '2'
+            else:
+                board = temp
+
+
+    # Stage 2
+    userHasMoved = False
+    while not userHasMoved:
+
+        # AI 1 - AI with NN
+        import pickle as pk
+        # with open("data%d.pkl" % board_size,"rb") as f: (x, y_targ) = pk.load(f)
+
+        # Optimization loop
+        x = encode(board)
+        print(x)
+        y_targ = encode(alphaBetaPruning(board, ai_depth, False, alpha, beta, True, h1).board)
+        # print("---ytarg")
+        # print(y_targ)
+
+        optimizer = tr.optim.Adam(net.parameters())
+        train_loss, test_loss = [], []
+        shuffle = np.random.permutation(range(len(x)))
+        split = 12
+        train, test = shuffle[:-split], shuffle[-split:]
+        for epoch in range(iterations):
+            y_train, e_train = optimization_step(optimizer, net, x[train], y_targ[train])
+            y_test, e_test = calculate_loss(net, x[test], y_targ[test])
+            if epoch % 10 == 0: print("%d: %f (%f)" % (epoch, e_train.item(), e_test.item()))
+            train_loss.append(e_train.item() / (len(shuffle)-split))
+            test_loss.append(e_test.item() / split)
+        
+        tr.save(net.state_dict(), "model%d.pth" % board_size)
+        board = decode(x)
+
+        # AI 2
+        evaluation = alphaBetaPruning(board, ai_depth, False, alpha, beta, False, h2)
+
+        states_reached = getStatesReached()
+        boardOutput(board)
+        print("Number of tree nodes processed: ", states_reached)
+        nodes_accessed += states_reached
+
+        temp = evaluation.board
+        if evaluation.evaluator == float('-inf'):
+            print("AI Bot 2 has WON!")
+            alphabeta_win = 1
+            return nodes_accessed, alphabeta_win
+        else:
+            pos = old_pos = 0
+            human_pieces = numOfValue(board, '1')
+            human_pieces_ai = numOfValue(temp, '1')
+            if human_pieces_ai - human_pieces < 0:
+                for i in range(24):
+                    if board[i] == 'X' and temp[i] == '2':
+                        pos = i
+                        break
+
+                for j in range(24):
+                    if board[j] == '2' and temp[j] == 'X':
+                        old_pos = j
+                        break
+
+                arr = [1, 1, 1, 0]
+                ans = random.choice(arr)
+
+                if ans == 1:
+                    board = temp
+                    print("Removal Successful")
+                else:
+                    print("Removal Unsuccessful")
+                    board[pos] = '2'
+                    board[old_pos] = 'X'
+            else:
+                board = temp
+
+    return nodes_accessed, alphabeta_win    
 
 def AI_VS_AI(h1, h2):
 
@@ -823,10 +975,11 @@ if __name__ == "__main__":
     print("2. Human vs Tree-based AI")
     print("3. Baseline AI vs Tree-based AI")
     print("4. Simulate Baseline AI vs Tree-based AI x 100 & plot")
+    print("5. AI vs AI NN")
 
     gametype = int(input("Please enter 1 or 2 or 3 or 4: "))
 
-    while gametype != 1 and gametype != 2 and gametype != 3 and gametype != 4:
+    while gametype != 1 and gametype != 2 and gametype != 3 and gametype != 4 and gametype != 5:
         gametype = int(input("Please enter 1 or 2 or 3 or 4"))
 
     if gametype == 1:
@@ -849,6 +1002,8 @@ if __name__ == "__main__":
             print("Winner ", winner)
         print("Nodes Array: ", nodes_arr)
         print("Winner Array: ", winners_arr)
+    elif gametype == 5:
+        AI_VS_AI_NN(numberOfPiecesHeuristic, AdvancedHeuristic)
 
 
 
