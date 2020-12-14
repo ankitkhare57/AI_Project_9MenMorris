@@ -12,8 +12,7 @@ beta = float('inf')
 depth = 3
 ai_depth = 4
 n = 9
-board_size = int((8*n)/3)
-iterations = 5
+iterations = 20
 
 def boardOutput(board):
         
@@ -36,6 +35,581 @@ def boardOutput(board):
         print("|                           |                           |")
         print(board[5]+"(05)----------------------"+board[6]+"(06)----------------------"+board[7]+"(07)")
 
+
+def HUMAN_VS_HUMAN():
+    board = []
+    for i in range(24):
+        board.append('X')
+
+    boardOutput(board)
+
+    print("STAGE 1 (Place)")
+    for i in range(9):
+        # FOR PLAYER 1, STAGE 1-------------------------------------
+        finished1 = False
+        while not finished1:
+            try:
+                pos1 = int(input("\nPLAYER '1': Place a piece at: "))
+                print()
+                if board[pos1] == 'X':
+                    board[pos1] = '1'
+                    if isCloseMill(pos1, board):
+                        itemPlaced = False
+                        while not itemPlaced:
+                            try:
+                                arr = [1, 1, 1, 0]
+                                ans = random.choice(arr)
+                                if ans == 1:
+                                    ans = 0.75
+                                else: 
+                                    ans = 0.25
+                                boardOutput(board)
+                                pos2 = int(input('\nA Mill is formed.\nRemove Player "2\'s" piece: '))
+
+                                if (board[pos2] == '2' and not isCloseMill(pos2, board)) or allIsMill(board, '2'):
+                                    if ans == 0.75:
+                                        board[pos2] = 'X'
+                                        itemPlaced = True
+                                        print("Probability of removing Player '2\'s' piece", ans)
+                                        print("Remove Successful")
+                                    else:  
+                                        print("Probability of removing Player '2\'s' piece", ans)
+                                        print("Cannot Remove. Player '2\'s' turn")
+                                        break
+                                else:
+                                    print("Invalid Position! Try again!")
+                                    
+                            except Exception as e:
+                                print("Input out of bounds")
+                                print(str(e))
+
+                    finished1 = True
+                    boardOutput(board)
+
+                else:
+                    print("There is already a piece in position ",pos1)
+                    
+            except Exception as e:
+                print("Couldn't get the input value!")
+                print(str(e))
+
+        
+
+        # FOR PLAYER 2, STAGE 1-------------------------------------
+        finished2 = False
+        while not finished2:
+            try:
+                pos1 = int(input("\nPLAYER '2': Place a piece at: "))
+
+                if board[pos1] == 'X':
+                    board[pos1] = '2'
+                    if isCloseMill(pos1, board):
+                        itemPlaced = False
+                        while not itemPlaced:
+                            try:
+                                arr = [1, 1, 1, 0]
+                                ans = random.choice(arr)
+                                if ans == 1:
+                                    ans = 0.75
+                                else: 
+                                    ans = 0.25
+                                boardOutput(board)
+                                pos2 = int(input('\nA Mill is formed.\nRemove Player "1\'s" piece: '))
+                                
+                                if (board[pos2] == '1' and not isCloseMill(pos2, board)) or allIsMill(board, '1'):
+                                    if ans == 0.75:
+                                        board[pos2] = 'X'
+                                        print("Probability of removing Player \"1's\" piece", ans)
+                                        itemPlaced = True
+                                        print("Remove Successful")
+                                    else:  
+                                        print("Probability of removing Player \"1's\" piece", ans)
+                                        print("Cannot Remove. Player '1\'s' turn")
+                                        break
+                                else:
+                                    print("Probability of removing Player \"1's\" piece", ans)
+                                    print("Invalid Position! Try again!")
+                                    
+                            except Exception as e:
+                                print("Input out of bounds")
+                                print(str(e))
+
+                    finished2 = True
+                    boardOutput(board)
+                else:
+                    print("There is already a piece in position ", pos1)
+                
+            except Exception as e:
+                print("Couldn't get the input value!")
+                print(str(e))
+
+    print('\n')
+    print("STAGE 2 (Move)")
+    print('\n')
+
+    boardOutput(board)
+
+    while True:
+        # PLAYER 1 STAGE 2 (MOVE)
+        userMoved = False
+        while not userMoved:
+            try:
+                movable = False
+
+                if numOfValue(board, '1') == 3:
+                    only3 = True
+                else:
+                    only3 = False
+
+                while not movable:
+                    pos1 = int(input("\nPLAYER '1': Which '1\'s' piece will you move?: "))
+
+                    while board[pos1] != '1':
+                        print("Invalid. Try again.")
+                        pos1 = int(input("\nPLAYER '1': Which '1\'s' piece will you move?: "))
+
+                    if only3:
+                        movable = True
+                        print("Stage 3 for Player '1'. Allowed to Fly")
+                        break
+
+                    possibleMoves = adjacentLocations(pos1)
+
+                    for adjpos in possibleMoves:
+                        if board[adjpos] == 'X':
+                            movable = True
+                            break
+                    if movable == False:
+                        print("No empty adjacent pieces!")
+
+                userPlaced = False
+
+                while not userPlaced:
+                    newpos1 = int(input("'1\'s' New Position is : "))
+
+                    if newpos1 in adjacentLocations(pos1) or only3:
+
+                        if board[newpos1] == 'X':
+                            board[pos1] = 'X'
+                            board[newpos1] = '1'
+                            boardOutput(board)
+
+                            if isCloseMill(newpos1, board):
+                                userRemoved = False
+
+                                while not userRemoved:
+                                    try:
+                                        arr = [1, 1, 1, 0]
+                                        ans = random.choice(arr)
+                                        if ans == 0:
+                                            ans = 0.25
+                                        else: 
+                                            ans = 0.75
+                                        removepos1 = int(input("\nA Mill is Formed. Remove Player '2\'s' piece: "))
+
+                                        if board[removepos1] == '2' and not isCloseMill(removepos1, board) or allIsMill(board, '2'):
+                                            if ans == 0.75:
+                                                board[removepos1] = 'X'
+                                                userRemoved = True
+                                                boardOutput(board)
+                                                print("Probability of removing Player '2\'s' piece", ans)
+                                                print("Remove Successful")
+                                            else:
+                                                print("Probability of removing Player '2\'s' piece", ans)
+                                                print("Cannot Remove. Player '2\'s' turn")
+                                                break
+                                        else:
+                                            print("Invalid Position")
+                                            # print("Probability of removing Player 2's piece", ans)
+
+                                    except Exception as e:
+                                        print(str(e))
+                                        print("Error while accepting input")
+
+                            userPlaced = True
+                            userMoved = True
+                            # printBoard(board)
+
+                        else:
+                            print("Invalid Position")
+
+                    else:
+                        print("Only adjacent locations in Stage 2. Try again.")
+
+            except Exception as e:
+                print(str(e))
+
+        # printBoard(board)
+
+        if(len(stage23Moves(board)) == 0):
+            print("-----------")
+            print("    TIE    ")
+            print("-----------")
+            sys.exit()
+
+        elif numOfValue(board, '2') < 3:
+            print("PLAYER '1' WINS")
+            sys.exit()
+
+        # PLAYER 2 STAGE 2 MOVE
+        userMoved = False
+        while not userMoved:
+            try:
+                movable = False
+
+                if numOfValue(board, '2') == 3:
+                    only3 = True
+                else:
+                    only3 = False
+
+                while not movable:
+                    pos1 = int(input("\nPLAYER '2': Which '2\'s' piece will you move?: "))
+
+                    while board[pos1] != '2':
+                        print("Invalid. Try again.")
+                        pos1 = int(input("\nPLAYER '2': Which '2\'s' piece will you move?: "))
+
+                    if only3:
+                        movable = True
+                        print("Stage 3 for Player '2'. Allowed to Fly")
+                        break
+
+                    possibleMoves = adjacentLocations(pos1)
+
+                    for adjpos in possibleMoves:
+                        if board[adjpos] == 'X':
+                            movable = True
+                            break
+                    if movable == False:
+                        print("No empty adjacent pieces!")
+
+                userPlaced = False
+
+                while not userPlaced:
+                    newpos1 = int(input("'2' New Position is : "))
+
+                    if newpos1 in adjacentLocations(pos1) or only3:
+
+                        if board[newpos1] == 'X':
+                            board[pos1] = 'X'
+                            board[newpos1] = '2'
+                            boardOutput(board)
+
+                            if isCloseMill(newpos1, board):
+                                userRemoved = False
+                                while not userRemoved:
+                                    try:
+                                        arr = [1, 1, 1, 0]
+                                        ans = random.choice(arr)
+                                        if ans == 0:
+                                            ans = 0.25
+                                        else: ans = 0.75
+
+                                        removepos1 = int(input("\nA Mill is Formed. Remove Player '1\'s' piece: "))
+
+                                        if board[removepos1] == '1' and not isCloseMill(removepos1, board) or allIsMill(board, '1'):
+                                            if ans == 0.75:
+                                                board[removepos1] = 'X'
+                                                userRemoved = True
+                                                boardOutput(board)
+                                                print("Probability of removing Player 1's piece", ans)
+                                                print("Remove Successful")
+                                            else:
+                                                print("Probability of removing Player 1's piece", ans)
+                                                print("Cannot Remove. Player '1\'s' turn")
+                                                break
+                                        else:
+                                            print("Invalid Position")
+                                            # print("Probability of remomoving Player 1's piece", ans)
+                    
+                                    except Exception as e:
+                                        print(str(e))
+                                        print("Error while accepting input")
+
+                            userPlaced = True
+                            userMoved = True
+
+                        else:
+                            print("Invalid Position")
+
+                    else:
+                        print("Only adjacent locations in Stage 2. Try again.")
+
+            except Exception as e:
+                print(str(e))
+
+        # printBoard(board)
+
+        if(len(stage23Moves(board)) == 0):
+            print("-----------")
+            print("    TIE    ")
+            print("-----------")
+            sys.exit()
+
+        elif numOfValue(board, '1') < 3:
+            print("PLAYER '2' WINS")
+            sys.exit()
+
+
+def HUMAN_VS_AI_NN(h1):
+    board = []
+    for i in range(24):
+        board.append('X')
+
+    evaluation = evaluator()
+    nodes_accessed = 0
+    alphabeta_win = 0
+
+    board_size = 24
+    net = BlockusNet1(board_size=board_size)
+    print(net)
+    boardOutput(board)
+    # Stage 1 - Human
+    print("Stage 1")
+
+    for i in range(9):
+        finished1 = False
+        while not finished1:
+            try:
+                pos1 = int(input("\nPLAYER '1': Place a piece at: "))
+                print()
+                if board[pos1] == 'X':
+                    board[pos1] = '1'
+                    if isCloseMill(pos1, board):
+                        itemPlaced = False
+                        while not itemPlaced:
+                            try:
+                                arr = [1, 1, 1, 0]
+                                ans = random.choice(arr)
+                                if ans == 1:
+                                    ans = 0.75
+                                else: 
+                                    ans = 0.25
+                                boardOutput(board)
+                                pos2 = int(input('\nA Mill is formed.\nRemove Player "2\'s" piece: '))
+
+                                if (board[pos2] == '2' and not isCloseMill(pos2, board)) or allIsMill(board, '2'):
+                                    if ans == 0.75:
+                                        board[pos2] = 'X'
+                                        itemPlaced = True
+                                        print("Probability of removing Player '2\'s' piece", ans)
+                                        print("Remove Successful")
+                                    else:  
+                                        print("Probability of removing Player '2\'s' piece", ans)
+                                        print("Cannot Remove. Player '2\'s' turn")
+                                        break
+                                else:
+                                    print("Invalid Position! Try again!")
+                                    
+                            except Exception as e:
+                                print("Input out of bounds")
+                                print(str(e))
+
+                    finished1 = True
+                    boardOutput(board)
+
+                else:
+                    print("There is already a piece in position ",pos1)
+                    
+            except Exception as e:
+                print("Couldn't get the input value!")
+                print(str(e))
+
+        # Stage 1 - Tree+NN AI
+
+        # Optimization loop
+        x = encode(board)
+        print(x)
+        y_targ = encode(alphaBetaPruning(board, ai_depth, False, alpha, beta, True, h1).board)
+
+        optimizer = tr.optim.Adam(net.parameters())
+        train_loss, test_loss = [], []
+        shuffle = np.random.permutation(range(len(x)))
+        split = 12
+        train, test = shuffle[:-split], shuffle[-split:]
+        for epoch in range(iterations):
+            y_train, e_train = optimization_step(optimizer, net, x[train], y_targ[train])
+            y_test, e_test = calculate_loss(net, x[test], y_targ[test])
+            if epoch % 10 == 0: 
+                print('Hello')
+                print("%d: %f (%f)" % (epoch, e_train.item(), e_test.item()))
+            train_loss.append(e_train.item() / (len(shuffle)-split))
+            test_loss.append(e_test.item() / split)
+        
+        tr.save(net.state_dict(), "model%d.pth" % board_size)
+        
+        board = decode(x)
+
+
+    # Stage 2 - Human
+    while True:
+        userMoved = False
+        while not userMoved:
+            try:
+                movable = False
+
+                if numOfValue(board, '1') == 3:
+                    only3 = True
+                else:
+                    only3 = False
+
+                while not movable:
+                    pos1 = int(input("\nPLAYER '1': Which '1\'s' piece will you move?: "))
+
+                    while board[pos1] != '1':
+                        print("Invalid. Try again.")
+                        pos1 = int(input("\nPLAYER '1': Which '1\'s' piece will you move?: "))
+
+                    if only3:
+                        movable = True
+                        print("Stage 3 for Player '1'. Allowed to Fly")
+                        break
+
+                    possibleMoves = adjacentLocations(pos1)
+
+                    for adjpos in possibleMoves:
+                        if board[adjpos] == 'X':
+                            movable = True
+                            break
+                    if movable == False:
+                        print("No empty adjacent pieces!")
+
+                userPlaced = False
+
+                while not userPlaced:
+                    newpos1 = int(input("'1\'s' New Position is : "))
+
+                    if newpos1 in adjacentLocations(pos1) or only3:
+
+                        if board[newpos1] == 'X':
+                            board[pos1] = 'X'
+                            board[newpos1] = '1'
+                            boardOutput(board)
+
+                            if isCloseMill(newpos1, board):
+                                userRemoved = False
+
+                                while not userRemoved:
+                                    try:
+                                        arr = [1, 1, 1, 0]
+                                        ans = random.choice(arr)
+                                        if ans == 0:
+                                            ans = 0.25
+                                        else: 
+                                            ans = 0.75
+                                        removepos1 = int(input("\nA Mill is Formed. Remove Player '2\'s' piece: "))
+
+                                        if board[removepos1] == '2' and not isCloseMill(removepos1, board) or allIsMill(board, '2'):
+                                            if ans == 0.75:
+                                                board[removepos1] = 'X'
+                                                userRemoved = True
+                                                boardOutput(board)
+                                                print("Probability of removing Player '2\'s' piece", ans)
+                                                print("Remove Successful")
+                                            else:
+                                                print("Probability of removing Player '2\'s' piece", ans)
+                                                print("Cannot Remove. Player '2\'s' turn")
+                                                break
+                                        else:
+                                            print("Invalid Position")
+                                            # print("Probability of removing Player 2's piece", ans)
+
+                                    except Exception as e:
+                                        print(str(e))
+                                        print("Error while accepting input")
+
+                            userPlaced = True
+                            userMoved = True
+                            # printBoard(board)
+
+                        else:
+                            print("Invalid Position")
+
+                    else:
+                        print("Only adjacent locations in Stage 2. Try again.")
+
+            except Exception as e:
+                print(str(e))
+
+        # printBoard(board)
+
+        if(len(stage23Moves(board)) == 0):
+            print("-----------")
+            print("    TIE    ")
+            print("-----------")
+            sys.exit()
+
+        elif numOfValue(board, '2') < 3:
+            print("PLAYER '1' WINS")
+            sys.exit()
+
+        # Stage 2 - Tree+NN AI
+
+        # Optimization loop
+        x = encode(board)
+        print(x)
+        y_targ = encode(alphaBetaPruning(board, ai_depth, False, alpha, beta, True, h1).board)
+        # print("---ytarg")
+        # print(y_targ)
+
+        optimizer = tr.optim.Adam(net.parameters())
+        train_loss, test_loss = [], []
+        shuffle = np.random.permutation(range(len(x)))
+        split = 12
+        train, test = shuffle[:-split], shuffle[-split:]
+        for epoch in range(iterations):
+            y_train, e_train = optimization_step(optimizer, net, x[train], y_targ[train])
+            y_test, e_test = calculate_loss(net, x[test], y_targ[test])
+            if epoch % 10 == 0: 
+                print("%d: %f (%f)" % (epoch, e_train.item(), e_test.item()))
+            train_loss.append(e_train.item() / (len(shuffle)-split))
+            test_loss.append(e_test.item() / split)
+        
+        tr.save(net.state_dict(), "model%d.pth" % board_size)
+        board = decode(x)
+
+        evaluation = alphaBetaPruning(board, ai_depth, False, alpha, beta, False, h2)
+
+        states_reached = getStatesReached()
+        boardOutput(board)
+        print("Number of tree nodes processed: ", states_reached)
+        nodes_accessed += states_reached
+
+        temp = evaluation.board
+        if evaluation.evaluator == float('-inf'):
+            print("Tree+NN AI has WON!")
+            alphabeta_win = 1
+            return nodes_accessed, alphabeta_win
+        else:
+            pos = old_pos = 0
+            human_pieces = numOfValue(board, '1')
+            human_pieces_ai = numOfValue(temp, '2')
+            if human_pieces_ai - human_pieces < 0:
+                for i in range(24):
+                    if board[i] == 'X' and temp[i] == '2':
+                        pos = i
+                        break
+
+                for j in range(24):
+                    if board[j] == '2' and temp[j] == 'X':
+                        old_pos = j
+                        break
+
+                arr = [1, 1, 1, 0]
+                ans = random.choice(arr)
+
+                if ans == 1:
+                    board = temp
+                    print("Removal Successful")
+                else:
+                    print("Removal Unsuccessful")
+                    board[pos] = '2'
+                    board[old_pos] = 'X'
+            else:
+                board = temp
+
+    return nodes_accessed, alphabeta_win   
+
 def AI_VS_AI_NN(h1, h2):
 
     board = []
@@ -55,8 +629,6 @@ def AI_VS_AI_NN(h1, h2):
     for i in range(9):
 
         # AI 1 - AI with NN
-        import pickle as pk
-        # with open("data%d.pkl" % board_size,"rb") as f: (x, y_targ) = pk.load(f)
 
         # Optimization loop
         x = encode(board)
@@ -73,7 +645,8 @@ def AI_VS_AI_NN(h1, h2):
         for epoch in range(iterations):
             y_train, e_train = optimization_step(optimizer, net, x[train], y_targ[train])
             y_test, e_test = calculate_loss(net, x[test], y_targ[test])
-            if epoch % 10 == 0: print("%d: %f (%f)" % (epoch, e_train.item(), e_test.item()))
+            if epoch % 10 == 0: 
+                print("%d: %f (%f)" % (epoch, e_train.item(), e_test.item()))
             train_loss.append(e_train.item() / (len(shuffle)-split))
             test_loss.append(e_test.item() / split)
         
@@ -119,8 +692,6 @@ def AI_VS_AI_NN(h1, h2):
     while not userHasMoved:
 
         # AI 1 - AI with NN
-        import pickle as pk
-        # with open("data%d.pkl" % board_size,"rb") as f: (x, y_targ) = pk.load(f)
 
         # Optimization loop
         x = encode(board)
@@ -137,7 +708,8 @@ def AI_VS_AI_NN(h1, h2):
         for epoch in range(iterations):
             y_train, e_train = optimization_step(optimizer, net, x[train], y_targ[train])
             y_test, e_test = calculate_loss(net, x[test], y_targ[test])
-            if epoch % 10 == 0: print("%d: %f (%f)" % (epoch, e_train.item(), e_test.item()))
+            if epoch % 10 == 0: 
+                print("%d: %f (%f)" % (epoch, e_train.item(), e_test.item()))
             train_loss.append(e_train.item() / (len(shuffle)-split))
             test_loss.append(e_test.item() / split)
         
@@ -396,14 +968,13 @@ def AI_VS_AI(h1, h2):
 def HUMAN_VS_AI(heuristic_stage1, heuristic_stage23):
     
     board = []
-    print("Enter number of pieces")
-    numberPlayers = int(input())
+
     for i in range(24):
         board.append('X')
 
     evaluation = evaluator()
         
-    for i in range(numberPlayers):
+    for i in range(9):
 
         boardOutput(board)
         finished = False
@@ -968,42 +1539,70 @@ def HUMAN_VS_AIBaseline(numberPlayers):
 
 
 if __name__ == "__main__":
-    
     print("Welcome to Nine Mens Morris")
     print("===========================")
-    print("1. Human vs Baseline AI")
-    print("2. Human vs Tree-based AI")
-    print("3. Baseline AI vs Tree-based AI")
-    print("4. Simulate Baseline AI vs Tree-based AI x 100 & plot")
-    print("5. AI vs AI NN")
+    print("1. Human vs Human")
+    print("2. Human vs Baseline AI")
+    print("3. Human vs Tree-based AI")
+    # # print("3. Baseline AI vs Tree-based AI")
+    # # print("4. Simulate Baseline AI vs Tree-based AI x 100 & plot")
+    # # print("5. AI vs AI NN")
+    print("4. Human vs Tree + NN AI")
+
+    # print("Enter number of pieces")
+    # numberPlayers = int(input())
 
     gametype = int(input("Please enter 1 or 2 or 3 or 4: "))
-
-    while gametype != 1 and gametype != 2 and gametype != 3 and gametype != 4 and gametype != 5:
-        gametype = int(input("Please enter 1 or 2 or 3 or 4"))
-
     if gametype == 1:
-            print("Enter number of pieces")
-            numberPlayers = int(input())
-            HUMAN_VS_AIBaseline(numberPlayers)
-    elif gametype == 2:
-        HUMAN_VS_AI(numberOfPiecesHeuristic, AdvancedHeuristic)
-    elif gametype == 3:
-        AI_VS_AI(numberOfPiecesHeuristic, AdvancedHeuristic)
-    elif gametype == 4:
-        nodes_arr = []
-        winners_arr = []
-        for i in range(5):
-            nodes, winner = AI_VS_AI(numberOfPiecesHeuristic, AdvancedHeuristic)
-            nodes_arr.append(nodes)
-            winners_arr.append(winner)
-            print("Game " + str(i+1) + " finished!")
-            print("Nodes Per Game: ", nodes)
-            print("Winner ", winner)
-        print("Nodes Array: ", nodes_arr)
-        print("Winner Array: ", winners_arr)
-    elif gametype == 5:
-        AI_VS_AI_NN(numberOfPiecesHeuristic, AdvancedHeuristic)
+        HUMAN_VS_HUMAN()
+    if gametype == 2:
+        # HUMAN_VS_AIBaseline(numberPlayers)
+        print("Done")
+    if gametype == 3:
+        HUMAN_VS_AI()
+    if gametype == 4:
+        HUMAN_VS_AI_NN(AdvancedHeuristic)
+    # while gametype != 1 and gametype != 2 and gametype != 3 and gametype != 4 and gametype != 5:
+    #     gametype = int(input("Please enter 1 or 2 or 3 or 4 or 5 or 6"))
+    #     if gametype == 1:
+    #         HUMAN_VS_HUMAN()
+
+    # if gametype == 1:
+    #         print("Enter number of pieces")
+    #         numberPlayers = int(input())
+    #         HUMAN_VS_AIBaseline(numberPlayers)
+    # elif gametype == 2:
+    #     HUMAN_VS_AI(numberOfPiecesHeuristic, AdvancedHeuristic)
+    # elif gametype == 3:
+    #     AI_VS_AI(numberOfPiecesHeuristic, AdvancedHeuristic)
+    # elif gametype == 4:
+    #     nodes_arr = []
+    #     winners_arr = []
+    #     for i in range(5):
+    #         nodes, winner = AI_VS_AI(numberOfPiecesHeuristic, AdvancedHeuristic)
+    #         nodes_arr.append(nodes)
+    #         winners_arr.append(winner)
+    #         print("Game " + str(i+1) + " finished!")
+    #         print("Nodes Per Game: ", nodes)
+    #         print("Winner ", winner)
+    #     print("Nodes Array: ", nodes_arr)
+    #     print("Winner Array: ", winners_arr)
+    # elif gametype == 5:
+    #     AI_VS_AI_NN(numberOfPiecesHeuristic, AdvancedHeuristic)
+
+    # -----
+        # print("Enter number of pieces")
+        # numberPlayers = int(input())
+        
+        # elif gametype == 2:
+        #     HUMAN_VS_AIBaseline(numberPlayers)
+        # elif gametype == 3:
+        #     HUMAN_VS_AI()
+        # elif gametype == 4:
+        #     HUMAN_VS_AI_NN()
+
+
+
 
 
 
