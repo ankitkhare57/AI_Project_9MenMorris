@@ -1549,15 +1549,14 @@ if __name__ == "__main__":
     # # print("5. AI vs AI NN")
     print("4. Human vs Tree + NN AI")
 
-    # print("Enter number of pieces")
-    # numberPlayers = int(input())
+    print("Enter number of pieces")
+    numberPlayers = int(input())
 
     gametype = int(input("Please enter 1 or 2 or 3 or 4: "))
     if gametype == 1:
         HUMAN_VS_HUMAN()
     if gametype == 2:
-        # HUMAN_VS_AIBaseline(numberPlayers)
-        print("Done")
+        HUMAN_VS_AIBaseline(numberPlayers)
     if gametype == 3:
         HUMAN_VS_AI()
     if gametype == 4:
