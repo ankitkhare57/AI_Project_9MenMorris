@@ -14,7 +14,7 @@
 3.  Follow on-screen prompts.
     
 ### Dependencies: Pytorch, Numpy
-**Install Pytorch:** Follow the instructions on this links: https://pytorch.org/get-started/locally/ based on the machine requirements.
+**Install Pytorch:** Follow the instructions on this links: https://pytorch.org/get-started/locally/ based on the machine requirements. <br>
 **Install Numpy:** Run pip install numpy
 
 ### Imports Used: copy, sys, random
