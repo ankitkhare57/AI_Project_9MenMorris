@@ -1,9 +1,11 @@
 
-### Steps to run the Project (Phase II):
+### Steps to run the Project (Phase III):
 1.  Download/Clone repository
 2.  cd "Phase II" 
 3.  Run main.py
-4.  Follow on screen prompts.
+4.  Select Problem Variation (number of pieces). The variation that we worked on are: 3 pieces, 4 pieces, 6 pieces, 7 pieces and 9 pieces
+5.  Choose from the 5 options: Human vs Human, Human vs Baseline AI, Human vs Tree-based AI, Human vs Tree and Neural Network AI and Train the data for Neural Network.
+6.  Follow on-screen prompts.
 
 
 ### Steps to run the Project (Phase I):
@@ -11,6 +13,10 @@
 2.  Run human_vs_human.py 
 3.  Follow on-screen prompts.
     
+### Dependencies: Pytorch, Numpy
+**Install Pytorch:** Follow the instructions on this links: https://pytorch.org/get-started/locally/ based on the machine requirements.
+**Install Numpy:** Run pip install numpy
+
 ### Imports Used: copy, sys, random
 
 ### Procedure Descriptions:
@@ -86,3 +92,5 @@
 #### References:<br>
 1. The Rules of Merels or Nine Men’s Morris. (2019). Retrieved October 28, 2020, from https://www.mastersofgames.com/rules/morris-rules.htm <br>
 2. 9MensMorris. (2019). Retrieved October 28, 2020, from https://github.com/SidJain1412/9MensMorris<br>
+3. Paszke, A., Gross, S., Chintala, S., Chanan, G., Yang, E., DeVito, Z., Lin, Z., Desmaison, A., Antiga, L., & Lerer, A. (2017). Automatic differentiation in PyTorch. In NIPS-W.<br>
+4. Harris, C.R., Millman, K.J., van der Walt, S.J. et al. Array programming with NumPy. Nature 585, 357–362 (2020). DOI: 0.1038/s41586-020-2649-2. <br>
