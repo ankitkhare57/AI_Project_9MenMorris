@@ -3,7 +3,7 @@
 1.  Download/Clone repository
 2.  cd "Phase II" 
 3.  Run main.py
-4.  Select Problem Variation (number of pieces). The variation that we worked on are: 3 pieces, 4 pieces, 6 pieces, 7 pieces and 9 pieces
+4.  Select Problem Variation (number of pieces). The variation that we worked on are: 3 pieces, 4 pieces, 6 pieces, 7 pieces and 9 pieces. Please enter 3, 4, 6, 7 or 9.
 5.  Choose from the 5 options: Human vs Human, Human vs Baseline AI, Human vs Tree-based AI, Human vs Tree and Neural Network AI and Train the data for Neural Network.
 6.  Follow on-screen prompts.
 
