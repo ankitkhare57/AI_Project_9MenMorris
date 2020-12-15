@@ -33,16 +33,6 @@ def adjacentLocations(position):
 		[20, 22]
 	]
 
-	adjacent_6 = [
-        [1, 3], [0, 2, 9], [1, 4],
-        [0, 5, 11], [2, 7, 12],
-        [3, 6], [5, 7, 14],
-        [4, 6], [9, 11],
-        [1, 8, 10], [9, 12],
-        [3, 8, 13],
-        [4, 10, 15], [11, 14],
-        [6, 13, 15], [12, 14]
-    ]
 	return adjacent[position]
 
 def checkMillFormation(position, board, player):
@@ -96,6 +86,15 @@ def isMill(player, board, pos1, pos2):
 	return False
 
 
+def checkRemainingMoves(board, player):
+    for i in range(len(board)):
+        if board[i] == player:
+            adj_pos = adjacentLocations(i)
+            for pos in adj_pos:
+                if board[pos] == 'X':
+                    return True
+    return False
+
 # Return True if a player has a mill on the given position
 # def isMill_BaselineAI(position, board):
 #     player = board[position]
@@ -106,7 +105,7 @@ def isMill(player, board, pos1, pos2):
 
 def isMill_BaselineAI(position, board):
     player = board[position]
-    if player != 'x':
+    if player != 'X':
         return checkMillFormation(position, board, player)
     else:
         return False
@@ -232,20 +231,16 @@ def removePiece(board_clone, board_list):
 	return board_list
 
 def getPossibleMillCount(board, player):
-	'''
-	'''
+
 	count = 0
 
 	for i in range(len(board)):
 		if (board[i] == "X"):
 			if checkMillFormation(i, board, player):
-			# if checkNextMill_six(i, board, player):
 				count += 1
 	return count
 
 def getEvaluationStage23(board):
-	'''
-	'''
 	
 	numWhitePieces = numOfValue(board, "1")
 	numBlackPieces = numOfValue(board, "2")
@@ -265,8 +260,6 @@ def getEvaluationStage23(board):
 		return 0
 
 def potentialMillInFormation(position, board, player):
-	'''
-	'''
 	adjacent_list = adjacentLocations(position)
 
 	for i in adjacent_list:
@@ -276,8 +269,6 @@ def potentialMillInFormation(position, board, player):
 	return False
 
 def getPiecesInPotentialMillFormation(board, player):
-	'''
-	'''
 	count = 0
 
 	for i in range(len(board)):
@@ -296,6 +287,7 @@ def getPiecesInPotentialMillFormation(board, player):
 	return count
 
 # For board variation
+# Professor Gand Mara \'OO'/
 # Printing board
 def print_board_six(board):
 	print(board[0]+"(00)"+"----------------"+board[1]+"(01)"+"----------------"+board[2]+"(02)")
